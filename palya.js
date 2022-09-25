@@ -45,96 +45,6 @@ class Player {
   }
 }
 
-class Row {
-  constructor(id, y, nPlayers, players) {
-    this.id = id;
-    this.y = y;
-    this.players = this.getNumberOfPlayers(nPlayers);
-    this.actualPlayers = this.getPlayers(nPlayers, players);
-  }
-
-  getNumberOfPlayers(numPlayers) {
-    switch (numPlayers) {
-      case 1:
-        this.players = [4];
-        break;
-      case 2:
-        this.players = [2, 6];
-        break;
-      case 3:
-        this.players = [2, 4, 6];
-        break;
-      case 4:
-        this.players = [1, 3, 5, 7];
-        break;
-      case 5:
-        this.players = [0, 2, 4, 6, 8];
-        break;
-      case 20:
-        this.players = [1, 7];
-        break;
-      case 30:
-        this.players = [1, 4, 7];
-        break;
-      default:
-        this.players = [];
-    }
-    return this.players;
-  }
-
-  getPlayers(nPlayers, players) {
-    let retPlayers = [];
-    for (let i = 0; i < nPlayers; i++) {
-      retPlayers.push(players[number]);
-      number += 1;
-    }
-    return retPlayers;
-  }
-
-  drawPlayers(currentShape, kitColor, numberColor, bottomText) {
-    for (let i = 0; i < this.players.length; i++) {
-      let kit;
-      let x = horizontalPos[this.players[i]].pos;
-
-      switch (currentShape) {
-        case "kit":
-          kit = new Kit(x, this.y);
-          break;
-        case "rectangle":
-          kit = new Rectangle(
-            x - kitSize / 2,
-            this.y - kitSize / 2 - 5,
-            kitSize,
-            kitSize
-          );
-          break;
-        default:
-          kit = new Circle(x, this.y - 5, kitSize / 2, Math.PI * 2, 0);
-      }
-
-      kit.drawFilled(kitColor);
-      kit.writeText(
-        bottomText == "show-number"
-          ? this.actualPlayers[i].number
-          : this.actualPlayers[i].position,
-        numberColor,
-        x - 25,
-        this.y,
-        bottomText == "show-number" ? 35 : 22,
-        true
-      );
-      kit.writeText(
-        this.actualPlayers[i].name,
-        numberColor,
-        x - 25,
-        this.y + 50,
-        25,
-        true
-      );
-    }
-  }
-}
-
 class Shape {
   constructor(x, y) {
     this.x = x;
@@ -454,20 +364,6 @@ function val() {
       );
     }
   }
-
-  /*number = 0;
-  for (i = 1; i < 12; i++) {
-    let player = {};
-    player.name = document.getElementById("player" + i).value;
-    player.number = document.getElementById("playerno" + i).value;
-    player.position = document.getElementById("playerpos" + i).value;
-    players.push(player);
-  }
-
-  for (let i = 0; i < 6; i++) {
-    let row = new Row(i, verticalPos[i].pos, currentFormation[i], players);
-    row.drawPlayers(currentShape, kitFill, numberColor, bottomText);
-  }*/
 }
 
 function getPattern(color1, color2) {
