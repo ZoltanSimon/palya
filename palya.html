@@ -1,0 +1,184 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css">
+    <style>
+      .smallInput {
+        width: 14%;
+        margin-left: 9px;
+      }
+      .bigInput {
+        width: 65%;
+        margin-left: 9px;
+      }
+
+      .row {
+        margin-bottom: 5px;
+      }
+    </style>
+    <body>
+    <div class="container">
+      <canvas id="myCanvas" width="700" height="1100" style="border: 1px solid #d3d3d3" ></canvas>
+
+      <div style="float: right; width: 400px;">
+
+        <div class="row">
+          <button type="button" class="btn btn-primary" onclick="download()">Download starting 11</button>
+        </div>
+
+        <div class="row">
+          <div class="col-sm">
+            <label for="formation-selector">Choose a formation:</label>
+          </div>
+          <div class="col-sm">
+            <select onchange="val()" name="formation-selector" id="formation-selector" >
+              <option value="1-4-0-3-0-30">4-3-3</option>
+              <option value="1-4-0-4-0-2">4-4-2</option>
+              <option value="1-3-0-5-0-2">3-5-2</option>
+              <option value="1-3-3-0-3-1">3-3-3-1</option>
+              <option value="1-34-1-2-1-2">4-1-2-1-2</option>
+              <option value="1-4-2-0-3-1">4-2-3-1</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm">
+            <label for="shape-selector">Kit shape</label>
+          </div>
+          <div class="col-sm">
+            <select id="shape-selector" name="shape-selector" onchange="val()">
+              <option value="kit">Kit</option>
+              <option value="circle">Circle</option>
+              <option value="rectangle">Rectangle</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm">
+            <label for="pattern-selector">Kit pattern</label>
+          </div>
+          <div class="col-sm">
+            <select id="pattern-selector" name="pattern-selector" onchange="val()">
+              <option value="solid">Solid</option>
+              <option value="horizontal-stripes">Horizontal stripes</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm">
+            <label for="kit-color-selector">Select the color of the kit</label>
+          </div>
+          <div class="col-sm">
+            <input type="color" id="kit-color-selector" name="kit-color-selector" value="#457B9D" onchange="val()">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm">
+            <label for="kit-color-selector2">Select the color of the kit</label>
+          </div>
+          <div class="col-sm">
+            <input type="color" id="kit-color-selector2" name="kit-color-selector2" value="#E63946" onchange="val()">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm">
+            <label for="number-color-selector">Select the color of the text</label>
+          </div>
+          <div class="col-sm">
+            <input type="color" id="number-color-selector" name="number-color-selector" value="#ffffff" onchange="val()">
+          </div>
+        </div>
+
+        <div class="row">
+          <fieldset onchange="val()">
+            <div style="float: left; margin-right: 10px">
+              <input type="radio" id="show-number" name="bottom-text" value="show-number" checked>
+              <label for="show-number">Show Number</label>
+            </div>
+        
+            <div>
+              <input type="radio" id="show-position" name="bottom-text" value="show-position">
+              <label for="show-position">Show Position</label>
+            </div>
+          </fieldset>
+        </div>
+        
+        <div class="row">
+          <input type="text" id="playerpos1" name="playerpos1" value="GK" class="smallInput" onchange="val()" />
+          <input type="number" id="playerno1" name="playerno1" value="1" class="smallInput" onchange="val()" />
+          <input type="text" id="player1" name="player1" value="Player1" class="bigInput" onchange="val()" />
+        </div>
+
+        <div class="row">
+          <input type="text" id="playerpos2" name="playerpos2" value="LB" class="smallInput" onchange="val()" />
+          <input type="number" id="playerno2" name="playerno2" value="3" class="smallInput" onchange="val()" />
+          <input type="text" id="player2" name="player2" value="Player2" class="bigInput" onchange="val()" />
+        </div>
+
+        <div class="row">
+          <input type="text" id="playerpos3" name="playerpos3" value="CB" class="smallInput" onchange="val()" />
+          <input type="number" id="playerno3" name="playerno3" value="5" class="smallInput" onchange="val()" />
+          <input type="text" id="player3" name="player3" value="Player3" class="bigInput" onchange="val()" />
+        </div>
+
+        <div class="row">
+          <input type="text" id="playerpos4" name="playerpos4" value="CB" class="smallInput" onchange="val()" />
+          <input type="number"  id="playerno4" name="playerno4" value="4" class="smallInput" onchange="val()" />
+          <input type="text" id="player4" name="player4" value="Player4" class="bigInput" onchange="val()" />
+        </div>
+
+        <div class="row">
+          <input type="text" id="playerpos5" name="playerpos5" value="RB" class="smallInput" onchange="val()" />
+          <input type="number" id="playerno5" name="playerno5" value="2" class="smallInput" onchange="val()" />
+          <input type="text" id="player5" name="player5" value="Player5" class="bigInput" onchange="val()" />
+        </div>
+
+        <div class="row">
+          <input type="text" id="playerpos6" name="playerpos6" value="CM" class="smallInput" onchange="val()" />
+          <input type="number" id="playerno6" name="playerno6" value="6" class="smallInput" onchange="val()" />
+          <input type="text" id="player6" name="player6" value="Player6" class="bigInput" onchange="val()" />
+        </div>
+
+        <div class="row">
+          <input type="text" id="playerpos7" name="playerpos7" value="CM" class="smallInput" onchange="val()" />
+          <input type="number" id="playerno7" name="playerno7" value="7" class="smallInput" onchange="val()" />
+          <input type="text" id="player7" name="player7" value="Player7" class="bigInput" onchange="val()" />
+        </div>
+      
+        <div class="row">
+          <input type="text" id="playerpos8" name="playerpos8" value="CM" class="smallInput" onchange="val()" />
+          <input type="number" id="playerno8" name="playerno8" value="8" class="smallInput" onchange="val()" />
+          <input type="text" id="player8" name="player8" value="Player8" class="bigInput" onchange="val()" />
+        </div>
+
+        <div class="row">
+          <input type="text" id="playerpos9" name="playerpos9" value="LW" class="smallInput" onchange="val()" />
+          <input type="number" id="playerno9" name="playerno9" value="9" class="smallInput" onchange="val()" />
+          <input type="text" id="player9" name="player9" value="Player9" class="bigInput" onchange="val()" />
+        </div>
+
+        <div class="row">
+          <input type="text" id="playerpos10" name="playerpos10" value="ST" class="smallInput" onchange="val()" />
+          <input type="number" id="playerno10" name="playerno10" value="10" class="smallInput" onchange="val()" />
+          <input type="text" id="player10" name="player10" value="Player10" class="bigInput" onchange="val()" />
+        </div>
+
+        <div class="row">
+          <input type="text" id="playerpos11" name="playerpos11" value="RW" class="smallInput" onchange="val()" />
+          <input type="number" id="playerno11" name="playerno11" value="11" class="smallInput" onchange="val()" />
+          <input type="text" id="player11" name="player11" value="Player11" class="bigInput" onchange="val()" />
+        </div>
+
+
+      </div>
+    </div>
+
+  </body>
+  <foot>
+    <script src="palya.js"></script>
+  </foot>
+</html>
