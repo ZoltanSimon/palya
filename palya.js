@@ -13,7 +13,8 @@ class Player {
     this.x = x;
     this.y = y;
   }
-  drawPlayer(currentShape, kitColor, numberColor, bottomText, kitFill) {
+
+  drawPlayer(currentShape, kitColor, numberColor, bottomText, shadow) {
     let kit;
 
     switch (currentShape) {
@@ -23,15 +24,15 @@ class Player {
       case "rectangle":
         kit = new Rectangle(
           this.x - kitSize / 2,
-          this.y - kitSize / 2 - 5,
+          this.y - kitSize / 2 - 10,
           kitSize,
           kitSize
         );
         break;
       default:
-        kit = new Circle(x, this.y - 5, kitSize / 2, Math.PI * 2, 0);
+        kit = new Circle(this.x, this.y - 10, kitSize / 2, Math.PI * 2, 0);
     }
-
+    ctx.shadowColor = "black";
     kit.drawFilled(kitColor);
     kit.writeText(
       bottomText == "show-number" ? this.number : this.position,
@@ -39,9 +40,10 @@ class Player {
       this.x - 25,
       this.y,
       bottomText == "show-number" ? 35 : 22,
-      true
+      true,
+      shadow
     );
-    kit.writeText(this.name, numberColor, this.x - 25, this.y + 50, 25, true);
+    kit.writeText(this.name, "white", this.x - 25, this.y + 50, 25, true);
   }
 }
 
@@ -59,13 +61,16 @@ class Shape {
     ctx.stroke();
   }
 
-  writeText(number, color, x, y, size, bold) {
+  writeText(number, color, x, y, size, bold, shadow) {
     let boldText = bold ? "bold" : "";
     ctx.font = `${boldText} ${size}px Arial`;
     ctx.textAlign = "center";
     ctx.fillStyle = color;
     ctx.strokeStyle = "black";
     ctx.lineWidth = 0.5;
+    shadow == "show-shadow"
+      ? (ctx.shadowColor = "black")
+      : (ctx.shadowColor = "rgba(0,0,0,0)");
     ctx.fillText(number, marg + x, y + 4);
     ctx.strokeText(number, marg + x, y + 4);
   }
@@ -114,7 +119,7 @@ class Circle extends Shape {
   }
   draw() {
     ctx.beginPath();
-    ctx.moveTo(this.x + kitSize / 2, this.y);
+    ctx.moveTo(this.x + this.radius, this.y);
     ctx.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle);
     ctx.stroke();
     ctx.closePath();
@@ -145,7 +150,7 @@ class pitch extends Rectangle {
     this.height = pitch.height;
   }
 
-  drawBigPitch() {
+  drawBigPitch(patern, watermark) {
     let pCentreX = marg + pitch.width / 2;
     let pCentreY = marg + pitch.height / 2;
 
@@ -154,25 +159,47 @@ class pitch extends Rectangle {
     let gkAreaBottom = new gkArea(marg + pitch.height - gkArea.height);
     let gkAreaTop = new gkArea(marg);
     let goalAreaTop = new goalArea(marg - goalArea.height);
-    let goalAreaBottom = new goalArea(pitch.height + marg);
+    //let goalAreaBottom = new goalArea(pitch.height + marg);
     let bigCircle = new Circle(pCentreX, pCentreY, 128, 0, 2 * Math.PI);
     let smallCircle = new Circle(pCentreX, pCentreY, 3, 0, 2 * Math.PI);
+    let penPointTop = new Circle(pCentreX, marg + 110, 3, 0, 2 * Math.PI);
+    let penPointBottom = new Circle(
+      pCentreX,
+      marg + pitch.height - 110,
+      3,
+      0,
+      2 * Math.PI
+    );
 
-    ctx.fillStyle = "#A8DADC";
+    ctx.fillStyle = "#457B9D";
     ctx.fillRect(0, 0, c.width, c.height);
+
+    //Add watermark
+    if (watermark == "show-watermark") {
+      ctx.font = `bold 18px Arial`;
+      ctx.textAlign = "center";
+      ctx.fillStyle = "white";
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 0.5;
+      ctx.fillText("https://generationfootball.net", 573, 1095);
+      ctx.strokeText("https://generationfootball.net", 573, 1095);
+    }
+
     ctx.lineWidth = 2;
     ctx.strokeStyle = "white";
-
-    this.drawFilled("green");
+    ctx.shadowColor = "rgba(0,0,0,0)";
+    this.drawFilled(patern);
 
     gkAreaBottom.draw();
     gkAreaTop.draw();
     penAreaBottom.draw();
     penAreaTop.draw();
     goalAreaTop.draw();
-    //goalAreaBottom.draw();
+    //goalAreaBottom.drawFilled("grey");
     bigCircle.draw();
-    smallCircle.draw();
+    smallCircle.drawFilled("white");
+    penPointTop.drawFilled("white");
+    penPointBottom.drawFilled("white");
 
     ctx.beginPath();
     ctx.moveTo(marg, pCentreY);
@@ -189,12 +216,6 @@ class pitch extends Rectangle {
       -0.87 * Math.PI,
       -0.13 * Math.PI
     ); // D bottom
-
-    ctx.moveTo(pCentreX, marg + 110);
-    ctx.arc(pCentreX, marg + 110, 3, 0, 2 * Math.PI); //11 point top
-
-    ctx.moveTo(pCentreX, marg + pitch.height - 110);
-    ctx.arc(pCentreX, marg + pitch.height - 110, 3, 0, 2 * Math.PI); //11 point bottom
 
     ctx.moveTo(marg, marg);
     ctx.arc(marg, marg, 10, Math.PI / 2, 0, true); //corner top left
@@ -214,8 +235,13 @@ class pitch extends Rectangle {
       Math.PI,
       true
     ); //corner bottom right
+
     ctx.stroke();
     ctx.closePath();
+    ctx.shadowColor = "black";
+    ctx.shadowBlur = 6;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
   }
 }
 
@@ -282,21 +308,23 @@ for (i = 0; i < 9; i++) {
 }
 
 let verticalPos = [];
-for (i = 0; i < 5; i++) {
+for (i = 0; i < 7; i++) {
   let item = {};
-  item.pos = marg + (pitch.height / 6) * (i + 1);
+  item.pos = marg + ((pitch.height - 20) / 8) * (i + 1);
   switch (i) {
     case 0:
       item.name = "F";
       break;
     case 1:
-      item.name = "W/AM";
-      break;
     case 2:
-      item.name = "M";
+      item.name = "W";
       break;
     case 3:
-      item.name = "WB/DM";
+      item.name = "M";
+      break;
+    case 4:
+    case 5:
+      item.name = "WB";
       break;
     default:
       item.name = "B";
@@ -304,15 +332,14 @@ for (i = 0; i < 5; i++) {
   }
   verticalPos.push(item);
 }
-verticalPos.push({ pos: 1043, name: "GK" });
+verticalPos.push({ pos: 1042, name: "GK" });
 verticalPos = verticalPos.reverse();
 
 val();
 
 function val() {
   ctx.clearRect(0, 0, c.width, c.height); //clear canvas
-  let bigPitch = new pitch(marg, marg);
-  bigPitch.drawBigPitch();
+
   let currentFormation = document
     .getElementById("formation-selector")
     .value.split("-")
@@ -325,61 +352,99 @@ function val() {
   let bottomText = document.querySelector(
     'input[name="bottom-text"]:checked'
   ).value;
+  let showShadow = document.querySelector(
+    'input[name="shadow-switch"]:checked'
+  ).value;
+  let watermark = document.querySelector(
+    'input[name="watermark"]:checked'
+  ).value;
   var pattern = getPattern(kitColor, kitColor2);
   let kitFill = kitPattern == "horizontal-stripes" ? pattern : kitColor;
+
+  if (kitPattern == "horizontal-stripes") {
+    document.getElementById("secondary-kit-color").style.display = "flex";
+  } else {
+    document.getElementById("secondary-kit-color").style.display = "none";
+  }
+
+  let pitchPatt = document.getElementById("pitch-selector").value;
+
+  let pitchColor1 = "#00680a";
+  let pitchColor2 = "#007b0c";
+  let pitchPatern = horizontalPattern(pitchColor1, pitchColor2);
+  let pitchFill = pitchPatt == "pattern" ? pitchPatern : pitchColor1;
+
+  let bigPitch = new pitch(marg, marg);
+  bigPitch.drawBigPitch(pitchFill, watermark);
+
   number = 1;
 
+  //player position in inputs
   for (let i = 0; i < currentFormation.length; i++) {
-    let playerName, playerNumber, playerPosition;
     let segedTomb = getNumberOfPlayers(currentFormation[i]);
     for (let j = 0; j < segedTomb.length; j++) {
       if (i == 0) {
         document.getElementById("playerpos" + number).value =
-          verticalPos[i].name; //change positions on field
+          verticalPos[i].name;
+      } else if ([2, 3].includes(i) && [2, 3, 4, 5, 6].includes(segedTomb[j])) {
+        document.getElementById("playerpos" + number).value =
+          horizontalPos[segedTomb[j]].name + "DM";
+      } else if ([5, 6].includes(i) && [2, 3, 4, 5, 6].includes(segedTomb[j])) {
+        document.getElementById("playerpos" + number).value =
+          horizontalPos[segedTomb[j]].name + "AM";
       } else {
         document.getElementById("playerpos" + number).value =
-          horizontalPos[segedTomb[j]].name + verticalPos[i].name; //change positions on field}
+          horizontalPos[segedTomb[j]].name + verticalPos[i].name;
       }
 
-      playerName = document.getElementById("player" + number).value;
-      playerNumber = document.getElementById("playerno" + number).value;
-      playerPosition = document.getElementById("playerpos" + number).value;
-      playerX = horizontalPos[segedTomb[j]].pos;
-      playerY = verticalPos[i].pos;
-
-      number++;
       let player = new Player(
-        playerName,
-        playerNumber,
-        playerPosition,
-        playerX,
-        playerY
+        document.getElementById("player" + number).value,
+        document.getElementById("playerno" + number).value,
+        document.getElementById("playerpos" + number).value,
+        horizontalPos[segedTomb[j]].pos,
+        verticalPos[i].pos
       );
       player.drawPlayer(
         currentShape,
-        kitColor,
+        kitFill,
         numberColor,
         bottomText,
-        kitFill
+        showShadow
       );
+      number++;
     }
   }
 }
 
 function getPattern(color1, color2) {
-  let patWidth = 6;
+  let patWidth = 8;
   // create the off-screen canvas
   var canvasPattern = document.createElement("canvas");
   canvasPattern.width = patWidth * 2;
   canvasPattern.height = 1;
   var contextPattern = canvasPattern.getContext("2d");
 
-  // draw pattern to off-screen context
   contextPattern.beginPath();
   contextPattern.fillStyle = color1;
   contextPattern.fillRect(0, 0, patWidth, 1);
   contextPattern.fillStyle = color2;
   contextPattern.fillRect(patWidth, 0, patWidth, 1);
+  contextPattern.stroke();
+  return ctx.createPattern(canvasPattern, "repeat");
+}
+
+function horizontalPattern(color1, color2) {
+  let patHeight = 25;
+  let canvasPattern = document.createElement("canvas");
+  canvasPattern.width = 1;
+  canvasPattern.height = patHeight * 2;
+  let contextPattern = canvasPattern.getContext("2d");
+
+  contextPattern.beginPath();
+  contextPattern.fillStyle = color1;
+  contextPattern.fillRect(0, 0, 1, patHeight);
+  contextPattern.fillStyle = color2;
+  contextPattern.fillRect(0, patHeight, 1, patHeight);
   contextPattern.stroke();
   return ctx.createPattern(canvasPattern, "repeat");
 }
@@ -414,6 +479,15 @@ function getNumberOfPlayers(numPlayers) {
       break;
     case 30:
       playAr = [1, 4, 7];
+      break;
+    case 40:
+      playAr = [0, 3, 5, 8];
+      break;
+    case 200:
+      playAr = [0, 8];
+      break;
+    case 300:
+      playAr = [0, 4, 8];
       break;
     default:
       playAr = [];
