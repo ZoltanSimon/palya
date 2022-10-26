@@ -3,49 +3,8 @@ let ctx = c.getContext("2d");
 
 const marg = 25;
 const kitSize = 80;
+const font = "Verdana";
 let number = 0;
-
-class Player {
-  constructor(name, number, position, x, y) {
-    this.name = name;
-    this.number = number;
-    this.position = position;
-    this.x = x;
-    this.y = y;
-  }
-
-  drawPlayer(currentShape, kitColor, numberColor, bottomText, shadow) {
-    let kit;
-
-    switch (currentShape) {
-      case "kit":
-        kit = new Kit(this.x, this.y);
-        break;
-      case "rectangle":
-        kit = new Rectangle(
-          this.x - kitSize / 2,
-          this.y - kitSize / 2 - 10,
-          kitSize,
-          kitSize
-        );
-        break;
-      default:
-        kit = new Circle(this.x, this.y - 10, kitSize / 2, Math.PI * 2, 0);
-    }
-    ctx.shadowColor = "black";
-    kit.drawFilled(kitColor);
-    kit.writeText(
-      bottomText == "show-number" ? this.number : this.position,
-      numberColor,
-      this.x - 25,
-      this.y,
-      bottomText == "show-number" ? 35 : 22,
-      true,
-      shadow
-    );
-    kit.writeText(this.name, "white", this.x - 25, this.y + 50, 25, true);
-  }
-}
 
 class Shape {
   constructor(x, y) {
@@ -61,18 +20,63 @@ class Shape {
     ctx.stroke();
   }
 
-  writeText(number, color, x, y, size, bold, shadow) {
+  writeText(text, color, x, y, size, bold, shadow) {
     let boldText = bold ? "bold" : "";
-    ctx.font = `${boldText} ${size}px Arial`;
+    ctx.font = `${boldText} ${size}px ${font}`;
     ctx.textAlign = "center";
     ctx.fillStyle = color;
     ctx.strokeStyle = "black";
-    ctx.lineWidth = 0.5;
+    ctx.lineWidth = 0.3;
     shadow == "show-shadow"
       ? (ctx.shadowColor = "black")
       : (ctx.shadowColor = "rgba(0,0,0,0)");
-    ctx.fillText(number, marg + x, y + 4);
-    ctx.strokeText(number, marg + x, y + 4);
+
+    ctx.fillText(text, marg + x, y + 4);
+    ctx.strokeText(text, marg + x, y + 4);
+  }
+}
+
+class Player {
+  constructor(name, number, position, x, y) {
+    this.name = name;
+    this.number = number;
+    this.position = position;
+    this.x = x;
+    this.y = y;
+  }
+
+  drawPlayer(kitDesign) {
+    let kit;
+    ctx.shadowColor = "black";
+    switch (kitDesign.shape) {
+      case "kit":
+        kit = new Kit(this.x, this.y);
+        kit.draw(kitDesign.color1, kitDesign.color2, kitDesign.pattern);
+        break;
+      case "rectangle":
+        kit = new Rectangle(
+          this.x - kitSize / 2,
+          this.y - kitSize / 2 - 10,
+          kitSize,
+          kitSize
+        );
+        kit.drawFilled(kitDesign.color1);
+        break;
+      default:
+        kit = new Circle(this.x, this.y - 10, kitSize / 2, Math.PI * 2, 0);
+        kit.drawFilled(kitDesign.color1);
+    }
+
+    kit.writeText(
+      kitDesign.bottomText == "show-number" ? this.number : this.position,
+      kitDesign.numberColor,
+      this.x - 26,
+      this.y,
+      kitDesign.bottomText == "show-number" ? 28 : 22,
+      true,
+      kitDesign.showShadow
+    );
+    kit.writeText(this.name, "white", this.x - 25, this.y + 50, 25, true);
   }
 }
 
@@ -80,7 +84,7 @@ class Kit extends Shape {
   constructor(x, y) {
     super(x, y);
   }
-  draw() {
+  draw(color1, color2, pattern) {
     let x = this.x - 20;
     let y = this.y + 30;
 
@@ -91,22 +95,91 @@ class Kit extends Shape {
 
     ctx.moveTo(x, y);
     ctx.lineTo(x + kitSize / 2 + 2, y); //bottom line
-
     ctx.lineTo(x + kitSize / 2, y - kitSize / 2 - 14); //right side
     ctx.lineTo(x + kitSize / 2 + 5, y - kitSize / 2); //right sleeve bottom
     ctx.lineTo(x + kitSize / 2 + 20, y - kitSize / 2 - 6); //right sleeve vertical
     ctx.lineTo(x + kitSize / 2 + 6, y - kitSize / 2 - 32); //right sleeve top
-
     ctx.lineTo(x + kitSize / 2 - 12, y - kitSize); //right top curve
     ctx.lineTo(x + kitSize / 2 - 28, y - kitSize); //center top curve
-
     ctx.lineTo(x - 5, y - kitSize / 2 - 32); //left top curve
     ctx.lineTo(x - 20, y - kitSize / 2 - 6); //left sleeve top
     ctx.lineTo(x - 6, y - kitSize / 2); //left sleeve vertical
-    ctx.lineTo(x, y - kitSize / 2 - 14); //left sleeve bottom
+    ctx.lineTo(x, y - kitSize / 2 - 14); //left sleeve bottom*/
     ctx.lineTo(x - 2, y); //left side
 
     ctx.closePath();
+    ctx.stroke();
+    ctx.fillStyle = color1;
+    ctx.fill();
+
+    if (pattern.indexOf("vertical") > -1) {
+      this.verticalPattern(x, y, color2);
+    }
+
+    if (pattern.indexOf("horizontal") > -1) {
+      this.horizontalPattern(x, y, color2);
+    }
+  }
+
+  verticalPattern(x, y, color) {
+    let centreRectangle1 = new Rectangle(
+      x + 1,
+      y - kitSize + 10,
+      7,
+      kitSize - 11
+    );
+    let centreRectangle2 = new Rectangle(
+      x + 17,
+      y - kitSize + 4,
+      7,
+      kitSize - 5
+    );
+    let centreRectangle3 = new Rectangle(
+      x + 32,
+      y - kitSize + 10,
+      7,
+      kitSize - 11
+    );
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 0.5;
+    ctx.shadowColor = "rgba(0,0,0,0)";
+    centreRectangle1.drawFilled(color);
+    centreRectangle2.drawFilled(color);
+    centreRectangle3.drawFilled(color);
+  }
+
+  horizontalPattern(x, y, color) {
+    let centreRectangle1 = new Rectangle(
+      x + 1,
+      y - kitSize + 16,
+      kitSize / 2,
+      7
+    );
+    let centreRectangle2 = new Rectangle(
+      x + 1,
+      y - kitSize + 34,
+      kitSize / 2,
+      7
+    );
+    let centreRectangle3 = new Rectangle(
+      x,
+      y - kitSize + 52,
+      kitSize / 2 + 1,
+      7
+    );
+    let centreRectangle4 = new Rectangle(
+      x - 1,
+      y - kitSize + 70,
+      kitSize / 2 + 2,
+      7
+    );
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 0.5;
+    ctx.shadowColor = "rgba(0,0,0,0)";
+    centreRectangle1.drawFilled(color);
+    centreRectangle2.drawFilled(color);
+    centreRectangle3.drawFilled(color);
+    centreRectangle4.drawFilled(color);
   }
 }
 
@@ -151,15 +224,14 @@ class pitch extends Rectangle {
   }
 
   drawBigPitch(patern, watermark) {
+    ctx.clearRect(0, 0, c.width, c.height); //clear canvas
     let pCentreX = marg + pitch.width / 2;
     let pCentreY = marg + pitch.height / 2;
-
     let penAreaBottom = new penArea(marg + pitch.height - penArea.height);
     let penAreaTop = new penArea(marg);
     let gkAreaBottom = new gkArea(marg + pitch.height - gkArea.height);
     let gkAreaTop = new gkArea(marg);
     let goalAreaTop = new goalArea(marg - goalArea.height);
-    //let goalAreaBottom = new goalArea(pitch.height + marg);
     let bigCircle = new Circle(pCentreX, pCentreY, 128, 0, 2 * Math.PI);
     let smallCircle = new Circle(pCentreX, pCentreY, 3, 0, 2 * Math.PI);
     let penPointTop = new Circle(pCentreX, marg + 110, 3, 0, 2 * Math.PI);
@@ -174,19 +246,16 @@ class pitch extends Rectangle {
     ctx.fillStyle = "#457B9D";
     ctx.fillRect(0, 0, c.width, c.height);
 
-    //Add watermark
     if (watermark == "show-watermark") {
-      ctx.font = `bold 18px Arial`;
+      //Add watermark
+      ctx.font = `bold 14px ${font}`;
       ctx.textAlign = "center";
       ctx.fillStyle = "white";
-      ctx.strokeStyle = "black";
-      ctx.lineWidth = 0.5;
-      ctx.fillText("https://generationfootball.net", 573, 1095);
-      ctx.strokeText("https://generationfootball.net", 573, 1095);
+      ctx.fillText("https://generationfootball.net", 575, 1093);
     }
 
     ctx.lineWidth = 2;
-    ctx.strokeStyle = "white";
+    ctx.strokeStyle = "#C0C0C0";
     ctx.shadowColor = "rgba(0,0,0,0)";
     this.drawFilled(patern);
 
@@ -195,7 +264,6 @@ class pitch extends Rectangle {
     penAreaBottom.draw();
     penAreaTop.draw();
     goalAreaTop.draw();
-    //goalAreaBottom.drawFilled("grey");
     bigCircle.draw();
     smallCircle.drawFilled("white");
     penPointTop.drawFilled("white");
@@ -338,40 +406,36 @@ verticalPos = verticalPos.reverse();
 val();
 
 function val() {
-  ctx.clearRect(0, 0, c.width, c.height); //clear canvas
-
   let currentFormation = document
     .getElementById("formation-selector")
     .value.split("-")
     .map(Number);
-  let currentShape = document.getElementById("shape-selector").value;
-  let kitPattern = document.getElementById("pattern-selector").value;
-  let kitColor = document.getElementById("kit-color-selector").value;
-  let kitColor2 = document.getElementById("kit-color-selector2").value;
-  let numberColor = document.getElementById("number-color-selector").value;
-  let bottomText = document.querySelector(
-    'input[name="bottom-text"]:checked'
-  ).value;
-  let showShadow = document.querySelector(
-    'input[name="shadow-switch"]:checked'
-  ).value;
-  let watermark = document.querySelector(
-    'input[name="watermark"]:checked'
-  ).value;
-  var pattern = getPattern(kitColor, kitColor2);
-  let kitFill = kitPattern == "horizontal-stripes" ? pattern : kitColor;
+  let kitDesign = {
+    shape: document.getElementById("shape-selector").value,
+    pattern: document.getElementById("pattern-selector").value,
+    color1: document.getElementById("kit-color-selector").value,
+    color2: document.getElementById("kit-color-selector2").value,
+    numberColor: document.getElementById("number-color-selector").value,
+    bottomText: document.querySelector('input[name="bottom-text"]:checked')
+      .value,
+    showShadow: document.querySelector('input[name="shadow-switch"]:checked')
+      .value,
+  };
 
-  if (kitPattern == "horizontal-stripes") {
+  if (kitDesign.pattern.indexOf("stripes") > -1) {
     document.getElementById("secondary-kit-color").style.display = "flex";
   } else {
     document.getElementById("secondary-kit-color").style.display = "none";
   }
 
-  let pitchPatt = document.getElementById("pitch-selector").value;
+  let watermark = document.getElementById("watermark").value;
+  let showTeamName = document.querySelector("#show-team-name").checked;
+  let teamName = document.getElementById("team-name").value;
 
+  let pitchPatt = document.getElementById("pitch-selector").value;
   let pitchColor1 = "#00680a";
   let pitchColor2 = "#007b0c";
-  let pitchPatern = horizontalPattern(pitchColor1, pitchColor2);
+  let pitchPatern = horizontalPattern(25, pitchColor1, pitchColor2);
   let pitchFill = pitchPatt == "pattern" ? pitchPatern : pitchColor1;
 
   let bigPitch = new pitch(marg, marg);
@@ -404,37 +468,25 @@ function val() {
         horizontalPos[segedTomb[j]].pos,
         verticalPos[i].pos
       );
-      player.drawPlayer(
-        currentShape,
-        kitFill,
-        numberColor,
-        bottomText,
-        showShadow
-      );
+      player.drawPlayer(kitDesign);
       number++;
     }
   }
+  if (showTeamName) {
+    addTeamName(teamName);
+  }
 }
 
-function getPattern(color1, color2) {
-  let patWidth = 8;
-  // create the off-screen canvas
-  var canvasPattern = document.createElement("canvas");
-  canvasPattern.width = patWidth * 2;
-  canvasPattern.height = 1;
-  var contextPattern = canvasPattern.getContext("2d");
-
-  contextPattern.beginPath();
-  contextPattern.fillStyle = color1;
-  contextPattern.fillRect(0, 0, patWidth, 1);
-  contextPattern.fillStyle = color2;
-  contextPattern.fillRect(patWidth, 0, patWidth, 1);
-  contextPattern.stroke();
-  return ctx.createPattern(canvasPattern, "repeat");
+function addTeamName(teamName) {
+  ctx.font = `bold 40px ${font}`;
+  ctx.textAlign = "left";
+  ctx.fillStyle = "white";
+  ctx.strokeStyle = "#5A5A5A";
+  ctx.lineWidth = 1;
+  ctx.fillText(teamName, 30, 65);
 }
 
-function horizontalPattern(color1, color2) {
-  let patHeight = 25;
+function horizontalPattern(patHeight, color1, color2) {
   let canvasPattern = document.createElement("canvas");
   canvasPattern.width = 1;
   canvasPattern.height = patHeight * 2;
@@ -446,7 +498,7 @@ function horizontalPattern(color1, color2) {
   contextPattern.fillStyle = color2;
   contextPattern.fillRect(0, patHeight, 1, patHeight);
   contextPattern.stroke();
-  return ctx.createPattern(canvasPattern, "repeat");
+  return contextPattern.createPattern(canvasPattern, "repeat");
 }
 
 var download = function () {
