@@ -8,8 +8,12 @@ const xMarg = 22;
 const pitchWidth = 820 * ratio;
 const pitchHeight = 1050 * ratio;
 const font = "Verdana";
+const pCentreX = xMarg + pitchWidth / 2;
+const pCentreY = marg + pitchHeight / 2;
+const goalWidth = 64;
+const goalHeight = 18;
 
-let number = 0;
+let number = 1;
 
 class Shape {
   constructor(x, y) {
@@ -72,15 +76,16 @@ class Player {
         kit.drawFilled(kitDesign.color1);
     }
 
-    kit.writeText(
-      kitDesign.bottomText == "show-number" ? this.number : this.position,
-      kitDesign.numberColor,
-      this.x - kitSize / 3 + 2,
-      this.y,
-      kitDesign.bottomText == "show-number" ? 22 : 15,
-      true,
-      kitDesign.showShadow
-    );
+    if (kitDesign.bottomText != "show-off")
+      kit.writeText(
+        kitDesign.bottomText == "show-number" ? this.number : this.position,
+        kitDesign.numberColor,
+        this.x - kitSize / 3 + 2,
+        this.y,
+        kitDesign.bottomText == "show-number" ? 22 : 20,
+        true,
+        kitDesign.showShadow
+      );
     kit.writeText(
       this.name,
       "white",
@@ -224,13 +229,16 @@ class pitch extends Rectangle {
 
   drawBigPitch(patern, watermark) {
     ctx.clearRect(0, 0, c.width, c.height); //clear canvas
-    let pCentreX = xMarg + pitchWidth / 2;
-    let pCentreY = marg + pitchHeight / 2;
     let penAreaBottom = new penArea(marg + pitchHeight - penArea.height);
     let penAreaTop = new penArea(marg);
     let gkAreaBottom = new gkArea(marg + pitchHeight - gkArea.height);
     let gkAreaTop = new gkArea(marg);
-    let goalAreaTop = new goalArea(marg - goalArea.height);
+    let goalAreaTop = new Rectangle(
+      xMarg + (pitchWidth - goalWidth) / 2,
+      2,
+      goalWidth,
+      goalHeight
+    );
     let bigCircle = new Circle(pCentreX, pCentreY, 128 * ratio, 0, 2 * Math.PI);
     let smallCircle = new Circle(pCentreX, pCentreY, 3, 0, 2 * Math.PI);
     let penPointTop = new Circle(
@@ -348,19 +356,6 @@ class gkArea extends Rectangle {
   }
 }
 
-class goalArea extends Rectangle {
-  static width = 70;
-  static height = 20;
-
-  constructor(y) {
-    super(y);
-    this.y = y;
-    this.x = xMarg + (pitchWidth - goalArea.width) / 2;
-    this.width = goalArea.width;
-    this.height = goalArea.height;
-  }
-}
-
 const horizontalPos = [];
 for (i = 0; i < 9; i++) {
   let item = {};
@@ -425,8 +420,7 @@ function val() {
     color1: document.getElementById("kit-color-selector").value,
     color2: document.getElementById("kit-color-selector2").value,
     numberColor: document.getElementById("number-color-selector").value,
-    bottomText: document.querySelector('input[name="bottom-text"]:checked')
-      .value,
+    bottomText: document.getElementById("bottom-text").value,
     showShadow: document.querySelector('input[name="shadow-switch"]:checked')
       .value,
   };
@@ -452,10 +446,10 @@ function val() {
 
   number = 1;
 
-  //player position in inputs
   for (let i = 0; i < currentFormation.length; i++) {
     let segedTomb = getNumberOfPlayers(currentFormation[i]);
-    for (let j = 0; j < segedTomb.length; j++) {
+    console.log(segedTomb);
+    for (let j = segedTomb.length - 1; j >= 0; j--) {
       if (i == 0) {
         document.getElementById("playerpos" + number).value =
           verticalPos[i].name;
