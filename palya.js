@@ -1,9 +1,14 @@
 let c = document.getElementById("myCanvas");
 let ctx = c.getContext("2d");
 
-const marg = 25;
-const kitSize = 80;
+const ratio = 0.8;
+const kitSize = 80 * ratio;
+const marg = 20;
+const xMarg = 22;
+const pitchWidth = 820 * ratio;
+const pitchHeight = 1050 * ratio;
 const font = "Verdana";
+
 let number = 0;
 
 class Shape {
@@ -70,13 +75,20 @@ class Player {
     kit.writeText(
       kitDesign.bottomText == "show-number" ? this.number : this.position,
       kitDesign.numberColor,
-      this.x - 26,
+      this.x - kitSize / 3 + 2,
       this.y,
-      kitDesign.bottomText == "show-number" ? 28 : 22,
+      kitDesign.bottomText == "show-number" ? 22 : 15,
       true,
       kitDesign.showShadow
     );
-    kit.writeText(this.name, "white", this.x - 25, this.y + 50, 25, true);
+    kit.writeText(
+      this.name,
+      "white",
+      this.x - kitSize / 3 + 2,
+      this.y + kitSize * 0.75,
+      19,
+      true
+    );
   }
 }
 
@@ -85,8 +97,8 @@ class Kit extends Shape {
     super(x, y);
   }
   draw(color1, color2, pattern) {
-    let x = this.x - 20;
-    let y = this.y + 30;
+    let x = this.x - kitSize / 4;
+    let y = this.y + kitSize / 2;
 
     ctx.lineWidth = 1;
     ctx.strokeStyle = "black";
@@ -98,12 +110,12 @@ class Kit extends Shape {
     ctx.lineTo(x + kitSize / 2, y - kitSize / 2 - 14); //right side
     ctx.lineTo(x + kitSize / 2 + 5, y - kitSize / 2); //right sleeve bottom
     ctx.lineTo(x + kitSize / 2 + 20, y - kitSize / 2 - 6); //right sleeve vertical
-    ctx.lineTo(x + kitSize / 2 + 6, y - kitSize / 2 - 32); //right sleeve top
-    ctx.lineTo(x + kitSize / 2 - 12, y - kitSize); //right top curve
-    ctx.lineTo(x + kitSize / 2 - 28, y - kitSize); //center top curve
+    ctx.lineTo(x + kitSize / 2 + 5, y - kitSize / 2 - 32); //right sleeve top
+    ctx.lineTo(x + kitSize / 2 - 5, y - kitSize - 5); //right top curve
+    ctx.lineTo(x + 7, y - kitSize - 5); //center top curve
     ctx.lineTo(x - 5, y - kitSize / 2 - 32); //left top curve
     ctx.lineTo(x - 20, y - kitSize / 2 - 6); //left sleeve top
-    ctx.lineTo(x - 6, y - kitSize / 2); //left sleeve vertical
+    ctx.lineTo(x - 5, y - kitSize / 2); //left sleeve vertical
     ctx.lineTo(x, y - kitSize / 2 - 14); //left sleeve bottom*/
     ctx.lineTo(x - 2, y); //left side
 
@@ -122,22 +134,17 @@ class Kit extends Shape {
   }
 
   verticalPattern(x, y, color) {
-    let centreRectangle1 = new Rectangle(
-      x + 1,
-      y - kitSize + 10,
-      7,
-      kitSize - 11
-    );
+    let centreRectangle1 = new Rectangle(x, y - kitSize + 10, 6, kitSize - 11);
     let centreRectangle2 = new Rectangle(
-      x + 17,
+      x + 13,
       y - kitSize + 4,
-      7,
+      6,
       kitSize - 5
     );
     let centreRectangle3 = new Rectangle(
-      x + 32,
+      x + 26,
       y - kitSize + 10,
-      7,
+      6,
       kitSize - 11
     );
     ctx.strokeStyle = color;
@@ -149,27 +156,22 @@ class Kit extends Shape {
   }
 
   horizontalPattern(x, y, color) {
-    let centreRectangle1 = new Rectangle(
-      x + 1,
-      y - kitSize + 16,
-      kitSize / 2,
-      7
-    );
+    let centreRectangle1 = new Rectangle(x + 1, y - kitSize, kitSize / 2, 7);
     let centreRectangle2 = new Rectangle(
       x + 1,
-      y - kitSize + 34,
+      y - kitSize + 18,
       kitSize / 2,
       7
     );
     let centreRectangle3 = new Rectangle(
       x,
-      y - kitSize + 52,
+      y - kitSize + 36,
       kitSize / 2 + 1,
       7
     );
     let centreRectangle4 = new Rectangle(
       x - 1,
-      y - kitSize + 70,
+      y - kitSize + 54,
       kitSize / 2 + 2,
       7
     );
@@ -214,30 +216,33 @@ class Rectangle extends Shape {
 }
 
 class pitch extends Rectangle {
-  static width = 650;
-  static height = 1050;
-
   constructor(x, y) {
     super(x, y);
-    this.width = pitch.width;
-    this.height = pitch.height;
+    this.width = pitchWidth;
+    this.height = pitchHeight;
   }
 
   drawBigPitch(patern, watermark) {
     ctx.clearRect(0, 0, c.width, c.height); //clear canvas
-    let pCentreX = marg + pitch.width / 2;
-    let pCentreY = marg + pitch.height / 2;
-    let penAreaBottom = new penArea(marg + pitch.height - penArea.height);
+    let pCentreX = xMarg + pitchWidth / 2;
+    let pCentreY = marg + pitchHeight / 2;
+    let penAreaBottom = new penArea(marg + pitchHeight - penArea.height);
     let penAreaTop = new penArea(marg);
-    let gkAreaBottom = new gkArea(marg + pitch.height - gkArea.height);
+    let gkAreaBottom = new gkArea(marg + pitchHeight - gkArea.height);
     let gkAreaTop = new gkArea(marg);
     let goalAreaTop = new goalArea(marg - goalArea.height);
-    let bigCircle = new Circle(pCentreX, pCentreY, 128, 0, 2 * Math.PI);
+    let bigCircle = new Circle(pCentreX, pCentreY, 128 * ratio, 0, 2 * Math.PI);
     let smallCircle = new Circle(pCentreX, pCentreY, 3, 0, 2 * Math.PI);
-    let penPointTop = new Circle(pCentreX, marg + 110, 3, 0, 2 * Math.PI);
+    let penPointTop = new Circle(
+      pCentreX,
+      marg + 110 * ratio,
+      3,
+      0,
+      2 * Math.PI
+    );
     let penPointBottom = new Circle(
       pCentreX,
-      marg + pitch.height - 110,
+      marg + pitchHeight - 110,
       3,
       0,
       2 * Math.PI
@@ -248,10 +253,14 @@ class pitch extends Rectangle {
 
     if (watermark == "show-watermark") {
       //Add watermark
-      ctx.font = `bold 14px ${font}`;
+      ctx.font = `bold 13px ${font}`;
       ctx.textAlign = "center";
       ctx.fillStyle = "white";
-      ctx.fillText("https://generationfootball.net", 575, 1093);
+      ctx.fillText(
+        "https://generationfootball.net",
+        pitchWidth - xMarg * 3 - 10,
+        pitchHeight + 35
+      );
     }
 
     ctx.lineWidth = 2;
@@ -270,34 +279,34 @@ class pitch extends Rectangle {
     penPointBottom.drawFilled("white");
 
     ctx.beginPath();
-    ctx.moveTo(marg, pCentreY);
-    ctx.lineTo(pitch.width + marg, pCentreY); //half way line
+    ctx.moveTo(xMarg, pCentreY);
+    ctx.lineTo(pitchWidth + xMarg, pCentreY); //half way line
 
-    ctx.moveTo(pCentreX - 138, marg + penArea.height);
+    ctx.moveTo(pCentreX, marg + penArea.height);
     ctx.arc(pCentreX, marg + 110, 128, 0.87 * Math.PI, 0.13 * Math.PI, true); // D top
 
-    ctx.moveTo(pCentreX - 138, marg + pitch.height - penArea.height);
+    ctx.moveTo(pCentreX, marg + pitchHeight - penArea.height);
     ctx.arc(
       pCentreX,
-      marg + pitch.height - 110,
+      marg + pitchHeight - 110,
       128,
       -0.87 * Math.PI,
       -0.13 * Math.PI
     ); // D bottom
 
-    ctx.moveTo(marg, marg);
-    ctx.arc(marg, marg, 10, Math.PI / 2, 0, true); //corner top left
+    ctx.moveTo(xMarg, marg);
+    ctx.arc(xMarg, marg, 10, Math.PI / 2, 0, true); //corner top left
 
-    ctx.moveTo(marg + pitch.width, marg);
-    ctx.arc(marg + pitch.width, marg, 10, Math.PI, Math.PI / 2, true); //corner top right
+    ctx.moveTo(xMarg + pitchWidth, marg);
+    ctx.arc(xMarg + pitchWidth, marg, 10, Math.PI, Math.PI / 2, true); //corner top right
 
-    ctx.moveTo(marg, marg + pitch.height);
-    ctx.arc(marg, marg + pitch.height, 10, 1.5 * Math.PI, 0); //corner bottom left
+    ctx.moveTo(xMarg, marg + pitchHeight);
+    ctx.arc(xMarg, marg + pitchHeight, 10, 1.5 * Math.PI, 0); //corner bottom left
 
-    ctx.moveTo(marg + pitch.width, marg + pitch.height);
+    ctx.moveTo(xMarg + pitchWidth, marg + pitchHeight);
     ctx.arc(
-      marg + pitch.width,
-      marg + pitch.height,
+      xMarg + pitchWidth,
+      marg + pitchHeight,
       10,
       1.5 * Math.PI,
       Math.PI,
@@ -320,7 +329,7 @@ class penArea extends Rectangle {
   constructor(y) {
     super(y);
     this.y = y;
-    this.x = marg + (pitch.width - penArea.width) / 2;
+    this.x = xMarg + (pitchWidth - penArea.width) / 2;
     this.width = penArea.width;
     this.height = penArea.height;
   }
@@ -333,7 +342,7 @@ class gkArea extends Rectangle {
   constructor(y) {
     super(y);
     this.y = y;
-    this.x = marg + (pitch.width - gkArea.width) / 2;
+    this.x = xMarg + (pitchWidth - gkArea.width) / 2;
     this.width = gkArea.width;
     this.height = gkArea.height;
   }
@@ -346,7 +355,7 @@ class goalArea extends Rectangle {
   constructor(y) {
     super(y);
     this.y = y;
-    this.x = marg + (pitch.width - goalArea.width) / 2;
+    this.x = xMarg + (pitchWidth - goalArea.width) / 2;
     this.width = goalArea.width;
     this.height = goalArea.height;
   }
@@ -355,7 +364,7 @@ class goalArea extends Rectangle {
 const horizontalPos = [];
 for (i = 0; i < 9; i++) {
   let item = {};
-  item.pos = marg + (pitch.width / 10) * (i + 1);
+  item.pos = xMarg + (pitchWidth / 10) * (i + 1);
   switch (i) {
     case 0:
     case 1:
@@ -378,7 +387,7 @@ for (i = 0; i < 9; i++) {
 let verticalPos = [];
 for (i = 0; i < 7; i++) {
   let item = {};
-  item.pos = marg + ((pitch.height - 20) / 8) * (i + 1);
+  item.pos = marg + ((pitchHeight - 35) / 8) * (i + 1);
   switch (i) {
     case 0:
       item.name = "F";
@@ -400,7 +409,7 @@ for (i = 0; i < 7; i++) {
   }
   verticalPos.push(item);
 }
-verticalPos.push({ pos: 1042, name: "GK" });
+verticalPos.push({ pos: pitchHeight - 16, name: "GK" });
 verticalPos = verticalPos.reverse();
 
 val();
@@ -438,7 +447,7 @@ function val() {
   let pitchPatern = horizontalPattern(25, pitchColor1, pitchColor2);
   let pitchFill = pitchPatt == "pattern" ? pitchPatern : pitchColor1;
 
-  let bigPitch = new pitch(marg, marg);
+  let bigPitch = new pitch(xMarg, marg);
   bigPitch.drawBigPitch(pitchFill, watermark);
 
   number = 1;
@@ -483,7 +492,7 @@ function addTeamName(teamName) {
   ctx.fillStyle = "white";
   ctx.strokeStyle = "#5A5A5A";
   ctx.lineWidth = 1;
-  ctx.fillText(teamName, 30, 65);
+  ctx.fillText(teamName, xMarg + 15, 65);
 }
 
 function horizontalPattern(patHeight, color1, color2) {
@@ -545,4 +554,17 @@ function getNumberOfPlayers(numPlayers) {
       playAr = [];
   }
   return playAr;
+}
+
+var acc = document.getElementsByClassName("accordion");
+for (let i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function () {
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.maxHeight) {
+      panel.style.maxHeight = null;
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + "px";
+    }
+  });
 }
